@@ -1,3 +1,5 @@
+import {Tabulator} from "tabulator-tables";
+
 $(document).ready(function() {
     const feedbackData = JSON.parse($('#feedback-data').text());
 
@@ -17,22 +19,19 @@ $(document).ready(function() {
                     headerFilter: 'list',
                     headerFilterPlaceholder: "Filtrer par type",
                     headerFilterParams: {
-                        valuesLookup: {
-                            positif: "Positif",
-                            negatif: "Négatif"
-                        },
+                        valuesLookup: true,
                         clearable: true,
                     },
                 },
                 {
                     title: "Feedback",
-                    field: "content", // Changez 'feedback' en 'content'
+                    field: "content",
                     headerFilter: 'input',
                     headerFilterPlaceholder: "Filtrer par feedback",
                 },
                 {
                     title: "Date",
-                    field: "createdAt", // Changez 'date' en 'createdAt'
+                    field: "createdAt",
                     headerFilter: 'input',
                     headerFilterPlaceholder: "Filtrer par date"
                 }

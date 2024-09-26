@@ -20,7 +20,7 @@ $(document).ready(function() {
 
         submitButton.show();
     });
-    $('#submitFeedback').click(function(e) {
+    submitButton.click(function(e) {
         e.preventDefault();
 
         let feedbackData = {
@@ -46,11 +46,16 @@ $(document).ready(function() {
         url: '/api/feedback',
         method: 'GET',
         success: function(feedbacks) {
-            feedbacks.forEach(function(feedback) {
-                $('#feedbackList').append('<li>' + feedback.type + ': ' + feedback.content + '</li>');
-            });
+            if (feedbacks && feedbacks.length) {
+                feedbacks.forEach(function(feedback) {
+                    $('#feedbackList').append('<li>' + feedback.type + ': ' + feedback.content + '</li>');
+                });
+            } else {
+                console.warn('Aucun feedback trouvé.');
+            }
         },
         error: function(xhr) {
+            console.error('Erreur lors de la récupération des feedbacks', xhr);
             alert('Erreur lors de la récupération des feedbacks');
         }
     });
