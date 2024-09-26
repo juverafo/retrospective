@@ -3,49 +3,46 @@
 namespace App\Controller;
 
 use App\Entity\Feedback;
-use App\Entity\Participated;
-use App\Form\FeedbackEntryType;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\FeedbackRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Component\Routing\Annotation\Route;
 
 class FeedbackController extends AbstractController
 {
-    #[IsGranted("ROLE_USER")]
-    #[Route('/feedback', name: 'feedback')]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/api/feedback', methods: ['POST'])]
+    public function createFeedback(Request $request): JsonResponse
     {
-        $feedbacks = new \ArrayObject();
+        $data = json_decode($request->getContent(), true);
 
-        $form = $this->createForm(FeedbackEntryType::class, ['feedbacks' => $feedbacks]);
+        $feedback = new Feedback();
+        $feedback->setType($data['type']);
+        $feedback->setContent($data['content']);
+        $feedback->setCreatedAt(new \DateTimeImmutable());
 
-        $form->handleRequest($request);
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->persist($feedback);
+        $entityManager->flush();
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $submittedFeedbacks = $form->get('feedbacks')->getData();
+        return new JsonResponse(['status' => 'Feedback créé!'], Response::HTTP_CREATED);
+    }
 
-            foreach ($submittedFeedbacks as $feedback) {
-                $feedback->setCreatedAt(new \DateTimeImmutable());
-                $entityManager->persist($feedback);
-            }
+    #[Route('/api/feedback', methods: ['GET'])]
+    public function getFeedbacks(FeedbackRepository $feedbackRepository): JsonResponse
+    {
+        $feedbacks = $feedbackRepository->findAll();
+        $data = [];
 
-            $entityManager->flush();
-
-            $participated = new Participated();
-            $participated->setUserID($this->getUser());
-            $participated->setDate(new \DateTimeImmutable());
-
-            $entityManager->persist($participated);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Vos feedbacks ont bien été pris en compte.');
-            return $this->redirectToRoute('home');
+        foreach ($feedbacks as $feedback) {
+            $data[] = [
+                'type' => $feedback->getType(),
+                'content' => $feedback->getContent(),
+                'createdAt' => $feedback->getCreatedAt()->format('Y-m-d'),
+            ];
         }
-        return $this->render('feedback/index.html.twig', [
-            'form' => $form->createView(),
-        ]);
+
+        return new JsonResponse($data, Response::HTTP_OK);
     }
 }
