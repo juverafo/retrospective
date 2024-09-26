@@ -8,11 +8,5 @@
         <div id="feedback-table" class="mt-4"></div>
     </div>
 
-    <link href="{{ asset('css/tabulator.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('js/tabulator.min.js') }}"></script>
-
-
-    {% block javascripts %}
-        <script src="{{ asset('js/feedback.js') }}"></script>
-    {% endblock %}
+    <script id="feedback-data" type="application/json">{{ feedbacks|json_encode|raw }}</script>
 {% endblock %}

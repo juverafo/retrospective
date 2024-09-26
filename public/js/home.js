@@ -17,19 +17,22 @@ $(document).ready(function() {
                     headerFilter: 'list',
                     headerFilterPlaceholder: "Filtrer par type",
                     headerFilterParams: {
-                        valuesLookup: true,
+                        valuesLookup: {
+                            positif: "Positif",
+                            negatif: "Négatif"
+                        },
                         clearable: true,
                     },
                 },
                 {
                     title: "Feedback",
-                    field: "feedback",
+                    field: "content", // Changez 'feedback' en 'content'
                     headerFilter: 'input',
                     headerFilterPlaceholder: "Filtrer par feedback",
                 },
                 {
                     title: "Date",
-                    field: "date",
+                    field: "createdAt", // Changez 'date' en 'createdAt'
                     headerFilter: 'input',
                     headerFilterPlaceholder: "Filtrer par date"
                 }
