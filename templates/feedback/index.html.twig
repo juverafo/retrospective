@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Soumettre un Feedback{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <h1 class="mb-4">Retrospective</h1>
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+
+        {% if form.vars.errors|length > 0 %}
+            {% for error in form.vars.errors %}
+                <div class="alert alert-danger">{{ error.message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="mb-3 feedbacks" data-prototype="{{ form_widget(form.feedbacks.vars.prototype)|e('html') }}">
+            <h3>Vos Feedbacks</h3>
+            {% for feedback in form.feedbacks %}
+                <div class="feedback-entry mb-3">
+                    {{ form_label(feedback.type) }}
+                    {{ form_widget(feedback.type) }}
+                    {{ form_errors(feedback.type) }}
+
+                    {{ form_label(feedback.content) }}
+                    {{ form_widget(feedback.content) }}
+                    {% if feedback.content.vars.errors|length > 0 %}
+                        <div class="alert alert-danger">
+                            {% for error in feedback.content.vars.errors %}
+                                {{ error.message }}<br>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-secondary add-feedback">Ajouter un feedback</button>
+        <button type="submit" class="btn btn-primary" id="submit-button" style="display: none;">Soumettre</button>
+        {{ form_end(form) }}
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let feedbackCount = document.querySelector('.feedbacks').children.length;
+            let submitButton = document.getElementById('submit-button');
+
+            if (feedbackCount > 0) {
+                submitButton.style.display = 'block';
+            }
+
+            document.querySelector('.add-feedback').addEventListener('click', function(e) {
+                e.preventDefault();
+                let collectionHolder = document.querySelector('.feedbacks');
+                let newFeedbackForm = collectionHolder.dataset.prototype;
+
+                newFeedbackForm = newFeedbackForm.replace(/__name__/g, collectionHolder.children.length);
+                collectionHolder.insertAdjacentHTML('beforeend', newFeedbackForm);
+
+                submitButton.style.display = 'block';
+            });
+        });
+    </script>
+{% endblock %}

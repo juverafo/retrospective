@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Retrospective{% endblock %}
+
+{% block body %}
+    <div class="container my-3">
+        <h1 class="h3 mb-3">Retrospective</h1>
+        <div id="feedback-table" class="mt-4"></div>
+    </div>
+
+    <link href="{{ asset('css/tabulator.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('js/tabulator.min.js') }}"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const feedbackData = {{ feedbacks|json_encode|raw }};
+
+            if (typeof Tabulator !== 'undefined') {
+                const table = new Tabulator("#feedback-table", {
+                    data: feedbackData,
+                    layout: "fitColumns",
+                    columns: [
+                        {
+                            title: "ID",
+                            field: "id",
+                            width: 50
+                        },
+                        {
+                            title: "Type",
+                            field: "type",
+                            headerFilter: 'list',
+                            headerFilterPlaceholder: "Filtrer par type",
+                            headerFilterParams: {
+                                valuesLookup: true,
+                                clearable: true,
+                            },
+                        },
+                        {
+                            title: "Feedback",
+                            field: "feedback",
+                            headerFilter: 'input',
+                            headerFilterPlaceholder: "Filtrer par feedback",
+                        },
+                        {
+                            title: "Date",
+                            field: "date",
+                            headerFilter: 'input',
+                            headerFilterPlaceholder: "Filtrer par date"
+                        }
+                    ],
+                    rowFormatter: function(row) {
+                        const data = row.getData();
+                        if (data.type === 'positif') {
+                            row.getElement().style.backgroundColor = 'lightgreen';
+                        } else if (data.type === 'negatif') {
+                            row.getElement().style.backgroundColor = 'lightcoral';
+                        }
+                    }
+                });
+            } else {
+                console.error("Tabulator is not defined.");
+            }
+        });
+    </script>
+{% endblock %}

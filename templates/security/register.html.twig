@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Inscription{% endblock %}
+
+{% block body %}
+    <div class="container container-fluid my-3">
+        <h1 class="h3 mb-3 font-weight-normal">Inscrivez-vous</h1>
+
+        <div class="row mb-3">
+            <div class="col-2 col-form-label mt-1">
+                {{ form_label(form.email) }}
+            </div>
+            <div class="col-9">
+                {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.email) }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-2 col-form-label mt-1">
+                {{ form_label(form.password) }}
+            </div>
+            <div class="col-9">
+                {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+                {{ form_errors(form.password) }}
+            </div>
+        </div>
+
+        <div class="row mb-3">
+            <div class="col-2 col-form-label mt-1">
+                {{ form_label(form.roles) }}
+            </div>
+            <div class="col-9 d-flex">
+                <div class="form-check me-3">
+                    {{ form_widget(form.roles[0]) }}
+                    {{ form_label(form.roles[0]) }}
+                </div>
+                <div class="form-check">
+                    {{ form_widget(form.roles[1]) }}
+                    {{ form_label(form.roles[1]) }}
+                </div>
+                {{ form_errors(form.roles) }}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">S'inscrire</button>
+    </div>
+
+{% endblock %}
