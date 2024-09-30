@@ -20,35 +20,29 @@ $(document).ready(function() {
 
         submitButton.show();
     });
-    submitButton.click(function(e) {
-        e.preventDefault();
-
-        let feedbackData = {
-            type: $('#feedbackType').val(),
-            content: $('#feedbackContent').val()
-        };
-
-        $.ajax({
-            url: '/api/feedback',
-            method: 'POST',
-            contentType: 'application/json',
-            data: {feedbackData: feedbackData},
-            success: function(response) {
-                alert('Feedback soumis avec succès');
-            },
-            error: function(xhr) {
-                alert('Erreur lors de la soumission du feedback');
-            }
-        });
-    });
 
     $.ajax({
         url: '/api/feedback',
         method: 'GET',
         success: function(feedbacks) {
-            if (feedbacks && feedbacks.length) {
-                feedbacks.forEach(function(feedback) {
-                    $('#feedbackList').append('<li>' + feedback.type + ': ' + feedback.content + '</li>');
+            if (typeof Tabulator !== 'undefined') {
+                const table = new Tabulator("#feedback-table", {
+                    data: feedbacks,
+                    layout: "fitColumns",
+                    columns: [
+                        {title: "ID", field: "id", width: 50},
+                        {title: "Type", field: "type", headerFilter: 'list', headerFilterParams: {valuesLookup: true, clearable: true}},
+                        {title: "Feedback", field: "content", headerFilter: 'input'},
+                        {title: "Date", field: "createdAt", headerFilter: 'input'}
+                    ],
+                    rowFormatter: function(row) {
+                        const data = row.getData();
+                        if (data.type === 'positif') {
+                            row.getElement().style.backgroundColor = 'lightgreen';
+                        } else if (data.type === 'negatif') {
+                            row.getElement().style.backgroundColor = 'lightcoral';
+                        }
+                    }
                 });
             } else {
                 console.warn('Aucun feedback trouvé.');

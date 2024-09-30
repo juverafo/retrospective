@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use App\Entity\Feedback;
+use App\Entity\Participated;
+use App\Form\FeedbackEntryType;
 use App\Repository\FeedbackRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,19 +20,38 @@ class FeedbackController extends AbstractController
     {
         $this->entityManager = $entityManager;
     }
-    #[Route('/api/feedback', methods: ['POST'])]
-    public function createFeedback(Request $request): JsonResponse
+    #[Route('/feedback', name: 'feedback')]
+    public function index(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $data = json_decode($request->getContent(), true);
+        $feedbacks = new \ArrayObject();
 
-        $feedback = new Feedback();
-        $feedback->setType($data['type']);
-        $feedback->setContent($data['content']);
-        $feedback->setCreatedAt(new \DateTimeImmutable());
-        $this->entityManager->persist($feedback);
-        $this->entityManager->flush();
+        $form = $this->createForm(FeedbackEntryType::class, ['feedbacks' => $feedbacks]);
 
-        return new JsonResponse(['status' => 'Feedback créé!'], Response::HTTP_CREATED);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $submittedFeedbacks = $form->get('feedbacks')->getData();
+
+            foreach ($submittedFeedbacks as $feedback) {
+                $feedback->setCreatedAt(new \DateTimeImmutable());
+                $entityManager->persist($feedback);
+            }
+
+            $entityManager->flush();
+
+            $participated = new Participated();
+            $participated->setUserID($this->getUser());
+            $participated->setDate(new \DateTimeImmutable());
+
+            $entityManager->persist($participated);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Vos feedbacks ont bien été pris en compte.');
+            return $this->redirectToRoute('home');
+        }
+        return $this->render('feedback/index.html.twig', [
+            'form' => $form->createView(),
+        ]);
     }
 
     #[Route('/api/feedback', methods: ['GET'])]
@@ -41,6 +62,7 @@ class FeedbackController extends AbstractController
 
         foreach ($feedbacks as $feedback) {
             $data[] = [
+                'id' => $feedback->getId(),
                 'type' => $feedback->getType(),
                 'content' => $feedback->getContent(),
                 'createdAt' => $feedback->getCreatedAt()->format('Y-m-d'),
