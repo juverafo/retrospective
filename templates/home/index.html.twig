@@ -5,6 +5,9 @@
 {% block body %}
     <div class="container my-3">
         <h1 class="h3 mb-3">Retrospective</h1>
+        <h5 class="my-2">Nombre de feedback: <span id="count">0</span></h5>
         <div id="feedback-table" class="mt-4"></div>
     </div>
+
+    <script id="feedback-data" type="application/json">{{ feedbacks|json_encode|raw }}</script>
 {% endblock %}

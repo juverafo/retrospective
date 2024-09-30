@@ -5,7 +5,6 @@
 {% block body %}
     <div class="container mt-5">
         <h1 class="mb-4">Retrospective</h1>
-
         {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
 
         {% if form.vars.errors|length > 0 %}

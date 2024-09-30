@@ -1,10 +1,11 @@
-import {Tabulator} from "tabulator-tables";
+$(document).ready(function(){
+function updateRowCount(filteredDataCount) {
+    $('#count').text(filteredDataCount);
+}
 
-$(document).ready(function() {
-    const feedbackData = JSON.parse($('#feedback-data').text());
-
+const feedbackData = JSON.parse($('#feedback-data').text());
     if (typeof Tabulator !== 'undefined') {
-        const table = new Tabulator("#feedback-table", {
+        const feedbackTable = new Tabulator("#feedback-table", {
             data: feedbackData,
             layout: "fitColumns",
             columns: [
@@ -25,13 +26,13 @@ $(document).ready(function() {
                 },
                 {
                     title: "Feedback",
-                    field: "content",
+                    field: "feedback",
                     headerFilter: 'input',
                     headerFilterPlaceholder: "Filtrer par feedback",
                 },
                 {
                     title: "Date",
-                    field: "createdAt",
+                    field: "date",
                     headerFilter: 'input',
                     headerFilterPlaceholder: "Filtrer par date"
                 }
@@ -45,7 +46,8 @@ $(document).ready(function() {
                 }
             }
         });
-    } else {
-        console.error("Tabulator is not defined.");
+    feedbackTable.on("dataFiltered", function(filters, rows) {
+        updateRowCount(rows.length);
+    });
     }
 });
