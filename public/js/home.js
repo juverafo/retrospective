@@ -3,6 +3,15 @@ function updateRowCount(filteredDataCount) {
     $('#count').text(filteredDataCount);
 }
 
+function rowFormatter(row) {
+    const data = row.getData();
+    if (data.type === 'positif') {
+        row.getElement().style.backgroundColor = 'lightgreen';
+    } else if (data.type === 'negatif') {
+        row.getElement().style.backgroundColor = 'lightcoral';
+    }
+}
+
 const feedbackData = JSON.parse($('#feedback-data').text());
     if (typeof Tabulator !== 'undefined') {
         const feedbackTable = new Tabulator("#feedback-table", {
@@ -37,14 +46,7 @@ const feedbackData = JSON.parse($('#feedback-data').text());
                     headerFilterPlaceholder: "Filtrer par date"
                 }
             ],
-            rowFormatter: function(row) {
-                const data = row.getData();
-                if (data.type === 'positif') {
-                    row.getElement().style.backgroundColor = 'lightgreen';
-                } else if (data.type === 'negatif') {
-                    row.getElement().style.backgroundColor = 'lightcoral';
-                }
-            }
+            rowFormatter: rowFormatter,
         });
     feedbackTable.on("dataFiltered", function(filters, rows) {
         updateRowCount(rows.length);
